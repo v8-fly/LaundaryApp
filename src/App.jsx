@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import { format } from "date-fns"
+import { startOfDay, endOfDay } from "date-fns"
 import AddClothes from "./components/AddClothes"
 import ClothesHistory from "./components/ClothesHistory"
 import Payment from "./components/Payment"
@@ -44,19 +44,17 @@ export default function App() {
   }
 
   const handlePayment = () => {
-    const newPaymentDate = new Date()
+    const newPaymentDate = endOfDay(new Date()) // Set to end of current day
     setLastPaymentDate(newPaymentDate)
-    // Clear clothes history
     setClothes([])
     setShowPayment(false)
-    // Reset persisted data
     localStorage.setItem("lastPaymentDate", newPaymentDate.toISOString())
     localStorage.removeItem("clothes")
   }
 
   return (
     <div className="max-w-md mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Laundry Tracker 🥳</h1>
+      <h1 className="text-2xl font-bold mb-4">Laundry Tracker</h1>
       <AddClothes onAdd={addClothes} />
       <ClothesHistory clothes={clothes} onUpdate={updateClothes} />
       {!showPayment && (
