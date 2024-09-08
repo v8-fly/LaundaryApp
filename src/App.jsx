@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react"
-
+import React, { useState, useEffect } from "react"
+import { format } from "date-fns"
 import AddClothes from "./components/AddClothes"
 import ClothesHistory from "./components/ClothesHistory"
 import Payment from "./components/Payment"
@@ -44,10 +44,14 @@ export default function App() {
   }
 
   const handlePayment = () => {
-    setLastPaymentDate(new Date())
-    setClothes([]) // Reset clothes state
-    setShowPayment(false) // Hide payment section after payment
-    localStorage.removeItem("clothes") // Clear localStorage
+    const newPaymentDate = new Date()
+    setLastPaymentDate(newPaymentDate)
+    // Clear clothes history
+    setClothes([])
+    setShowPayment(false)
+    // Reset persisted data
+    localStorage.setItem("lastPaymentDate", newPaymentDate.toISOString())
+    localStorage.removeItem("clothes")
   }
 
   return (
