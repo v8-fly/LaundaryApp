@@ -35,15 +35,22 @@ export default function Payment({
 
   const handlePayment = () => {
     const paymentDate = new Date()
-    onPayment(paymentDate)
-    alert(
+    const userConfirmed = window.confirm(
       `Payment of RS ${totalAmount.toFixed(
         2
       )} processed successfully for ${format(
         paymentDate,
         "dd-MMM-yyyy"
-      )}. The app will now reset.`
+      )}. Do you want to proceed?`
     )
+
+    if (userConfirmed) {
+      onPayment(paymentDate)
+      alert("The app will now reset.")
+      // Add logic to reset the app here, if necessary
+    } else {
+      alert("Payment was not processed.")
+    }
   }
 
   return (
