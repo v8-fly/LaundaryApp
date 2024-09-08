@@ -1,25 +1,26 @@
 import React, { useState, useEffect } from "react"
-import { startOfDay, endOfDay } from "date-fns"
 import AddClothes from "./components/AddClothes"
 import ClothesHistory from "./components/ClothesHistory"
 import Payment from "./components/Payment"
 
 export default function App() {
-  const [clothes, setClothes] = useState([])
-  const [lastPaymentDate, setLastPaymentDate] = useState(null)
+  const [clothes, setClothes] = useState(() => {
+    const savedClothes = localStorage.getItem("clothes")
+    if (savedClothes) {
+      return JSON.parse(savedClothes).map((item) => ({
+        ...item,
+        date: new Date(item.date),
+      }))
+    }
+    return []
+  })
+
+  const [lastPaymentDate, setLastPaymentDate] = useState(() => {
+    const savedDate = localStorage.getItem("lastPaymentDate")
+    return savedDate ? new Date(savedDate) : null
+  })
+
   const [showPayment, setShowPayment] = useState(false)
-
-  useEffect(() => {
-    const storedClothes = localStorage.getItem("clothes")
-    if (storedClothes) {
-      setClothes(JSON.parse(storedClothes))
-    }
-
-    const storedLastPaymentDate = localStorage.getItem("lastPaymentDate")
-    if (storedLastPaymentDate) {
-      setLastPaymentDate(new Date(storedLastPaymentDate))
-    }
-  }, [])
 
   useEffect(() => {
     localStorage.setItem("clothes", JSON.stringify(clothes))
@@ -28,44 +29,45 @@ export default function App() {
   useEffect(() => {
     if (lastPaymentDate) {
       localStorage.setItem("lastPaymentDate", lastPaymentDate.toISOString())
+    } else {
+      localStorage.removeItem("lastPaymentDate")
     }
   }, [lastPaymentDate])
 
   const addClothes = (date, count) => {
-    const newClothes = [...clothes, { date, count }]
-    newClothes.sort((a, b) => new Date(b.date) - new Date(a.date))
-    setClothes(newClothes)
+    setClothes((prevClothes) => [...prevClothes, { date, count }])
   }
 
   const updateClothes = (index, newCount) => {
-    const updatedClothes = [...clothes]
-    updatedClothes[index].count = newCount
-    setClothes(updatedClothes)
+    setClothes((prevClothes) =>
+      prevClothes.map((item, i) =>
+        i === index ? { ...item, count: newCount } : item
+      )
+    )
   }
 
-  const handlePayment = () => {
-    const newPaymentDate = endOfDay(new Date()) // Set to end of current day
-    setLastPaymentDate(newPaymentDate)
+  const handlePayment = (paymentDate) => {
+    // Reset the entire app state
     setClothes([])
+    setLastPaymentDate(paymentDate)
     setShowPayment(false)
-    localStorage.setItem("lastPaymentDate", newPaymentDate.toISOString())
+    // Clear local storage
     localStorage.removeItem("clothes")
   }
 
   return (
-    <div className="max-w-md mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Laundry Tracker</h1>
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">Laundry Tracker 🥳😎</h1>
       <AddClothes onAdd={addClothes} />
       <ClothesHistory clothes={clothes} onUpdate={updateClothes} />
-      {!showPayment && (
+      {!showPayment ? (
         <button
           onClick={() => setShowPayment(true)}
-          className="bg-green-500 text-white p-2 rounded w-full mb-4"
+          className="bg-blue-500 text-white p-2 rounded"
         >
           Show Payment
         </button>
-      )}
-      {showPayment && (
+      ) : (
         <Payment
           clothes={clothes}
           lastPaymentDate={lastPaymentDate}

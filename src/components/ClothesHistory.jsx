@@ -11,7 +11,7 @@ export default function ClothesHistory({ clothes, onUpdate }) {
         <ul className="space-y-2">
           {clothes.map((item, index) => (
             <li key={index} className="flex justify-between items-center">
-              <span>{format(new Date(item.date), "dd-MMM-yyyy")}</span>
+              <span>{format(item.date, "dd-MMM-yyyy")}</span>
               <input
                 type="number"
                 value={item.count}

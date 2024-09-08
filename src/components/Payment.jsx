@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react"
-import { format, startOfDay } from "date-fns"
+import { format, startOfDay, parseISO, isDate } from "date-fns"
 
 export default function Payment({
   clothes,
@@ -7,15 +7,23 @@ export default function Payment({
   onPayment,
   onCancel,
 }) {
-  const [pricePerItem, setPricePerItem] = useState(1)
+  const [pricePerItem, setPricePerItem] = useState(7)
+
+  const ensureDate = (date) => {
+    if (isDate(date)) return date
+    if (typeof date === "string") return parseISO(date)
+    return new Date(date)
+  }
 
   const clothesToPay = useMemo(() => {
-    if (!lastPaymentDate) return clothes
-    const paymentDay = startOfDay(lastPaymentDate)
-    return clothes.filter(
-      (item) => startOfDay(new Date(item.date)) > paymentDay
-    )
-  }, [clothes, lastPaymentDate])
+    // if (!lastPaymentDate) return clothes
+    // const paymentDay = startOfDay(ensureDate(lastPaymentDate))
+    // return clothes.filter((item) => {
+    //   const itemDate = ensureDate(item.date)
+    //   return startOfDay(itemDate) > paymentDay
+    // })
+    return clothes
+  }, [clothes])
 
   const totalClothes = useMemo(() => {
     return clothesToPay.reduce((sum, item) => sum + item.count, 0)
@@ -26,8 +34,16 @@ export default function Payment({
   }, [totalClothes, pricePerItem])
 
   const handlePayment = () => {
-    onPayment()
-    alert(`Payment of $${totalAmount.toFixed(2)} processed successfully!`)
+    const paymentDate = new Date()
+    onPayment(paymentDate)
+    alert(
+      `Payment of RS ${totalAmount.toFixed(
+        2
+      )} processed successfully for ${format(
+        paymentDate,
+        "dd-MMM-yyyy"
+      )}. The app will now reset.`
+    )
   }
 
   return (
@@ -47,7 +63,7 @@ export default function Payment({
           />
         </div>
         <p>Total clothes: {totalClothes}</p>
-        <p>Total amount: ${totalAmount.toFixed(2)}</p>
+        <p>Total amount: Rs {totalAmount.toFixed(2)}</p>
         <button
           onClick={handlePayment}
           className="bg-green-500 text-white p-2 rounded w-full"
@@ -66,7 +82,8 @@ export default function Payment({
         <ul className="space-y-1">
           {clothesToPay.map((item, index) => (
             <li key={index}>
-              {format(new Date(item.date), "dd-MMM-yyyy")} - {item.count} items
+              {format(ensureDate(item.date), "dd-MMM-yyyy")} - {item.count}{" "}
+              items
             </li>
           ))}
         </ul>

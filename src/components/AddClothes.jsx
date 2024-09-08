@@ -1,4 +1,4 @@
-import { useState } from "react"
+import React, { useState } from "react"
 import { format } from "date-fns"
 
 export default function AddClothes({ onAdd }) {
@@ -8,7 +8,7 @@ export default function AddClothes({ onAdd }) {
   const handleSubmit = (e) => {
     e.preventDefault()
     if (count) {
-      onAdd(date, parseInt(count, 10))
+      onAdd(new Date(date), parseInt(count, 10))
       setCount("")
     }
   }
