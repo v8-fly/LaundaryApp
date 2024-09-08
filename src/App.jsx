@@ -56,7 +56,7 @@ export default function App() {
 
   return (
     <div className="max-w-md mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Laundry Tracker</h1>
+      <h1 className="text-2xl font-bold mb-4">Laundry Tracker 🥳</h1>
       <AddClothes onAdd={addClothes} />
       <ClothesHistory clothes={clothes} onUpdate={updateClothes} />
       {!showPayment && (

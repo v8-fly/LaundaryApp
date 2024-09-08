@@ -24,7 +24,7 @@ export default function Payment({
 
   const handlePayment = () => {
     onPayment()
-    alert(`Payment of $${totalAmount.toFixed(2)} processed successfully!`)
+    alert(`Payment of RS ${totalAmount.toFixed(2)} processed successfully!`)
   }
 
   return (
@@ -44,7 +44,7 @@ export default function Payment({
           />
         </div>
         <p>Total clothes: {totalClothes}</p>
-        <p>Total amount: ${totalAmount.toFixed(2)}</p>
+        <p>Total amount: Rs {totalAmount.toFixed(2)}</p>
         <button
           onClick={handlePayment}
           className="bg-green-500 text-white p-2 rounded w-full"
