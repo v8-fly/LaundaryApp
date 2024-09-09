@@ -56,25 +56,35 @@ export default function App() {
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Laundry Tracker 🥳😎</h1>
-      <AddClothes onAdd={addClothes} />
-      <ClothesHistory clothes={clothes} onUpdate={updateClothes} />
-      {!showPayment ? (
-        <button
-          onClick={() => setShowPayment(true)}
-          className="bg-blue-500 text-white p-2 rounded"
-        >
-          Show Payment
-        </button>
-      ) : (
-        <Payment
-          clothes={clothes}
-          lastPaymentDate={lastPaymentDate}
-          onPayment={handlePayment}
-          onCancel={() => setShowPayment(false)}
-        />
-      )}
+    <div className="min-h-screen bg-gradient-to-br from-blue-100 to-indigo-200 py-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 className="text-4xl font-bold text-center text-indigo-800 mb-8">
+          Laundry Tracker
+        </h1>
+        <div className="bg-white rounded-lg shadow-xl p-6 mb-8">
+          <AddClothes onAdd={addClothes} />
+        </div>
+        <div className="bg-white rounded-lg shadow-xl p-6 mb-8">
+          <ClothesHistory clothes={clothes} onUpdate={updateClothes} />
+        </div>
+        {!showPayment ? (
+          <button
+            onClick={() => setShowPayment(true)}
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105"
+          >
+            Show Payment
+          </button>
+        ) : (
+          <div className="bg-white rounded-lg shadow-xl p-6">
+            <Payment
+              clothes={clothes}
+              lastPaymentDate={lastPaymentDate}
+              onPayment={handlePayment}
+              onCancel={() => setShowPayment(false)}
+            />
+          </div>
+        )}
+      </div>
     </div>
   )
 }
