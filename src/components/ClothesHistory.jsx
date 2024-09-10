@@ -1,7 +1,47 @@
 import React from "react"
 import { format } from "date-fns"
+// import { useTheme } from "../ThemeContext"
+import { useTheme } from "../components/ThemeContext"
+import { FixedSizeList as List } from "react-window"
 
-export default function ClothesHistory({ clothes, onUpdate, darkMode }) {
+const ClothesHistory = React.memo(function ClothesHistory({
+  clothes,
+  onUpdate,
+}) {
+  const { darkMode } = useTheme()
+
+  const Row = ({ index, style }) => {
+    const item = clothes[index]
+    return (
+      <div
+        style={style}
+        className={`flex ${
+          index % 2 === 0 ? (darkMode ? "bg-gray-800" : "bg-gray-50") : ""
+        }`}
+      >
+        <div
+          className={`flex-1 p-4 ${
+            darkMode ? "text-gray-300" : "text-gray-700"
+          }`}
+        >
+          {format(new Date(item.date), "dd-MMM-yyyy")}
+        </div>
+        <div className="flex-1 p-4">
+          <input
+            type="number"
+            value={item.count}
+            onChange={(e) => onUpdate(index, parseInt(e.target.value, 10))}
+            className={`w-20 px-2 py-1 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${
+              darkMode
+                ? "bg-gray-700 text-white border-gray-600"
+                : "bg-white text-gray-900 border-gray-300"
+            }`}
+          />
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div>
       <h2
@@ -20,64 +60,33 @@ export default function ClothesHistory({ clothes, onUpdate, darkMode }) {
           No clothes added yet.
         </p>
       ) : (
-        <div className="overflow-x-auto">
-          <table
-            className={`min-w-full divide-y ${
-              darkMode ? "divide-gray-700" : "divide-gray-200"
-            }`}
+        <div
+          className={`border rounded-md ${
+            darkMode ? "border-gray-700" : "border-gray-200"
+          }`}
+        >
+          <div
+            className={`flex ${
+              darkMode
+                ? "bg-gray-800 text-gray-300"
+                : "bg-gray-100 text-gray-700"
+            } font-medium`}
           >
-            <thead className={darkMode ? "bg-gray-800" : "bg-gray-50"}>
-              <tr>
-                <th
-                  className={`px-6 py-3 text-left text-xs font-medium ${
-                    darkMode ? "text-gray-400" : "text-gray-500"
-                  } uppercase tracking-wider`}
-                >
-                  Date
-                </th>
-                <th
-                  className={`px-6 py-3 text-left text-xs font-medium ${
-                    darkMode ? "text-gray-400" : "text-gray-500"
-                  } uppercase tracking-wider`}
-                >
-                  Count
-                </th>
-              </tr>
-            </thead>
-            <tbody
-              className={`${darkMode ? "bg-gray-900" : "bg-white"} divide-y ${
-                darkMode ? "divide-gray-700" : "divide-gray-200"
-              }`}
-            >
-              {clothes.map((item, index) => (
-                <tr key={index}>
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-sm ${
-                      darkMode ? "text-gray-300" : "text-gray-500"
-                    }`}
-                  >
-                    {format(item.date, "dd-MMM-yyyy")}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <input
-                      type="number"
-                      value={item.count}
-                      onChange={(e) =>
-                        onUpdate(index, parseInt(e.target.value, 10))
-                      }
-                      className={`w-20 px-2 py-1 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${
-                        darkMode
-                          ? "bg-gray-700 text-white border-gray-600"
-                          : "bg-white text-gray-900 border-gray-300"
-                      }`}
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+            <div className="flex-1 p-4">Date</div>
+            <div className="flex-1 p-4">Count</div>
+          </div>
+          <List
+            height={400}
+            itemCount={clothes.length}
+            itemSize={50}
+            width="100%"
+          >
+            {Row}
+          </List>
         </div>
       )}
     </div>
   )
-}
+})
+
+export default ClothesHistory

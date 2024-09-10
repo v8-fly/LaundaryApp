@@ -1,52 +1,19 @@
-import { useState, useEffect } from "react"
+import React, { useState, useMemo, Suspense, lazy } from "react"
+import { ThemeProvider, useTheme } from "./components/ThemeContext"
+import { useLocalStorage } from "./components/useLocalStorage"
 import AddClothes from "./components/AddClothes"
 import ClothesHistory from "./components/ClothesHistory"
-import Payment from "./components/Payment"
 import { Moon, Sun } from "lucide-react"
+// import ErrorBoundary from "./ErrorBoundary"
 
-export default function App() {
-  const [clothes, setClothes] = useState(() => {
-    const savedClothes = localStorage.getItem("clothes")
-    if (savedClothes) {
-      return JSON.parse(savedClothes).map((item) => ({
-        ...item,
-        date: new Date(item.date),
-      }))
-    }
-    return []
-  })
+const Payment = lazy(() => import("./components/Payment"))
 
-  const [lastPaymentDate, setLastPaymentDate] = useState(() => {
-    const savedDate = localStorage.getItem("lastPaymentDate")
-    return savedDate ? new Date(savedDate) : null
-  })
-
+function AppContent() {
+  const { darkMode, toggleDarkMode } = useTheme()
+  const [clothes, setClothes] = useLocalStorage("clothes", [])
   const [showPayment, setShowPayment] = useState(false)
-  const [darkMode, setDarkMode] = useState(() => {
-    const savedMode = localStorage.getItem("darkMode")
-    return savedMode ? JSON.parse(savedMode) : false
-  })
 
-  useEffect(() => {
-    localStorage.setItem("clothes", JSON.stringify(clothes))
-  }, [clothes])
-
-  useEffect(() => {
-    if (lastPaymentDate) {
-      localStorage.setItem("lastPaymentDate", lastPaymentDate.toISOString())
-    } else {
-      localStorage.removeItem("lastPaymentDate")
-    }
-  }, [lastPaymentDate])
-
-  useEffect(() => {
-    localStorage.setItem("darkMode", JSON.stringify(darkMode))
-    if (darkMode) {
-      document.documentElement.classList.add("dark")
-    } else {
-      document.documentElement.classList.remove("dark")
-    }
-  }, [darkMode])
+  const memoizedClothes = useMemo(() => clothes, [clothes])
 
   const addClothes = (date, count) => {
     setClothes((prevClothes) => [...prevClothes, { date, count }])
@@ -60,15 +27,9 @@ export default function App() {
     )
   }
 
-  const handlePayment = (paymentDate) => {
+  const handlePayment = () => {
     setClothes([])
-    setLastPaymentDate(paymentDate)
     setShowPayment(false)
-    localStorage.removeItem("clothes")
-  }
-
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode)
   }
 
   return (
@@ -95,27 +56,27 @@ export default function App() {
                 ? "bg-gray-700 text-yellow-300"
                 : "bg-gray-200 text-gray-800"
             }`}
+            aria-label={
+              darkMode ? "Switch to light mode" : "Switch to dark mode"
+            }
           >
             {darkMode ? <Sun size={24} /> : <Moon size={24} />}
           </button>
         </div>
+        {/* <ErrorBoundary> */}
         <div
           className={`${
             darkMode ? "bg-gray-800" : "bg-white"
           } rounded-lg shadow-xl p-6 mb-8`}
         >
-          <AddClothes onAdd={addClothes} darkMode={darkMode} />
+          <AddClothes onAdd={addClothes} />
         </div>
         <div
           className={`${
             darkMode ? "bg-gray-800" : "bg-white"
           } rounded-lg shadow-xl p-6 mb-8`}
         >
-          <ClothesHistory
-            clothes={clothes}
-            onUpdate={updateClothes}
-            darkMode={darkMode}
-          />
+          <ClothesHistory clothes={memoizedClothes} onUpdate={updateClothes} />
         </div>
         {!showPayment ? (
           <button
@@ -134,16 +95,25 @@ export default function App() {
               darkMode ? "bg-gray-800" : "bg-white"
             } rounded-lg shadow-xl p-6`}
           >
-            <Payment
-              clothes={clothes}
-              lastPaymentDate={lastPaymentDate}
-              onPayment={handlePayment}
-              onCancel={() => setShowPayment(false)}
-              darkMode={darkMode}
-            />
+            <Suspense fallback={<div>Loading payment...</div>}>
+              <Payment
+                clothes={memoizedClothes}
+                onPayment={handlePayment}
+                onCancel={() => setShowPayment(false)}
+              />
+            </Suspense>
           </div>
         )}
+        {/* </ErrorBoundary> */}
       </div>
     </div>
+  )
+}
+
+export default function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
   )
 }

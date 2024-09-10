@@ -1,13 +1,18 @@
-import React, { useState, useMemo } from "react"
+import React, { useState, useMemo, memo } from "react"
 import { format, startOfDay, parseISO, isDate } from "date-fns"
+import { useTheme } from "../components/ThemeContext"
 
-export default function Payment({
-  clothes,
-  lastPaymentDate,
-  onPayment,
-  onCancel,
-  darkMode,
-}) {
+// export default function Payment({
+//   clothes,
+//   lastPaymentDate,
+//   onPayment,
+//   onCancel,
+// }) {
+
+// }
+
+const Payment = ({ clothes, lastPaymentDate, onPayment, onCancel }) => {
+  const { darkMode } = useTheme()
   const [pricePerItem, setPricePerItem] = useState(7)
 
   const ensureDate = (date) => {
@@ -17,12 +22,6 @@ export default function Payment({
   }
 
   const clothesToPay = useMemo(() => {
-    // if (!lastPaymentDate) return clothes
-    // const paymentDay = startOfDay(ensureDate(lastPaymentDate))
-    // return clothes.filter((item) => {
-    //   const itemDate = ensureDate(item.date)
-    //   return startOfDay(itemDate) > paymentDay
-    // })
     return clothes
   }, [clothes])
 
@@ -155,3 +154,7 @@ export default function Payment({
     </div>
   )
 }
+
+const MemoizedPayment = memo(Payment)
+
+export default MemoizedPayment
