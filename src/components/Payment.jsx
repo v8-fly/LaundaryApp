@@ -109,6 +109,18 @@ export default function Payment({
         </div>
         {/* Update button styles for dark mode */}
         {/* ... */}
+        <button
+          onClick={handlePayment}
+          className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out transform hover:scale-105"
+        >
+          Pay Now
+        </button>
+        <button
+          onClick={onCancel}
+          className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out transform hover:scale-105"
+        >
+          Cancel
+        </button>
       </div>
       <div className="mt-6">
         <h3

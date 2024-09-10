@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import AddClothes from "./components/AddClothes"
 import ClothesHistory from "./components/ClothesHistory"
 import Payment from "./components/Payment"
